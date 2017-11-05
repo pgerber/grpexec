@@ -1,0 +1,16 @@
+[package]
+name = "grpexec"
+version = "0.1.0"
+authors = ["Peter Gerber <peter@arbitrary.ch>"]
+
+[dependencies]
+clippy = { version = "*", optional = true }
+derive-error = "0.0"
+env_logger = "0.4"
+libc = "0.2"
+log = "0.3"
+
+
+[[bin]]
+name = "grpexec"
+path = "src/main.rs"
