@@ -81,13 +81,12 @@ fn get_gid_by_name(name: &str) -> Result<Gid, GrpError> {
             buf.resize(new_len, 0);
         }
 
-        if result.is_null() {
+        if let Some(group) = result.as_ref() {
+            debug!("GID of {:?} is {}", name, group.gr_gid);
+            Ok(Gid(group.gr_gid))
+        } else {
             debug!("group {:?} not found", name);
             Err(GrpError::NoSuchGroup)
-        } else {
-            let gid = (*result).gr_gid;
-            debug!("GID of {:?} is {}", name, gid);
-            Ok(Gid(gid))
         }
     }
 }
