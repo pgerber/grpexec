@@ -22,7 +22,7 @@ pub enum GrpError {
 
 impl GrpError {
     unsafe fn from_errno(prefix: &str) -> GrpError {
-        let mut buf = vec![0; 80];
+        let mut buf = [0_u8; 80];
         libc::strerror_r(errno(), buf.as_mut_ptr() as *mut libc::c_char, buf.len());
         let msg = CStr::from_ptr(buf.as_ptr() as *const libc::c_char);
         GrpError::CError(format!("{}: {}", prefix, msg.to_string_lossy()))
@@ -64,12 +64,12 @@ fn get_gid_by_name(name: &str) -> Result<Gid, GrpError> {
             gr_mem: ptr::null_mut(),
         };
         let mut result = ptr::null_mut();
-        let mut buf = vec![0; 128];
+        let mut buf = vec![0_u8; 128];
         loop {
             match libc::getgrnam_r(
                 c_name.as_ptr(),
                 &mut group,
-                buf.as_mut_ptr(),
+                buf.as_mut_ptr() as *mut i8,
                 buf.len(),
                 &mut result,
             ) {
@@ -98,7 +98,7 @@ fn is_user_in_group(gid: Gid) -> Result<bool, GrpError> {
     }
     let size = unsafe { libc::getgroups(0, ptr::null_mut()) };
     assert!(size >= 0);
-    let mut groups = vec![65534; size as usize];
+    let mut groups = vec![65534 as libc::gid_t; size as usize];
     unsafe {
         match libc::getgroups(size, groups.as_mut_ptr()) {
             -1 => Err(GrpError::from_errno("failed to fetch list of groups")),
