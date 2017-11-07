@@ -69,7 +69,7 @@ fn get_gid_by_name(name: &str) -> Result<Gid, GrpError> {
             match libc::getgrnam_r(
                 c_name.as_ptr(),
                 &mut group,
-                buf.as_mut_ptr() as *mut i8,
+                buf.as_mut_ptr() as *mut libc::c_char,
                 buf.len(),
                 &mut result,
             ) {
