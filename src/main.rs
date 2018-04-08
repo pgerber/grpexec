@@ -18,7 +18,7 @@ fn abort(msg: &str) -> ! {
 }
 
 fn main() {
-    env_logger::init().expect("failed to initialize logger");
+    env_logger::init();
 
     // parse args
     let mut args = env::args_os();
