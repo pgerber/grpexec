@@ -74,11 +74,13 @@ fn get_gid_by_name(name: &str) -> Result<Gid, GrpError> {
                 &mut result,
             ) {
                 0 => break, // success
-                -1 if errno() == libc::ERANGE => (), // buffer too small
+                -1 if errno() == libc::ERANGE => {
+                    // buffer too small
+                    let new_len = buf.len() * 2;
+                    buf.resize(new_len, 0);
+                },
                 _ => return Err(GrpError::from_errno("failed to get GID by name")),
             }
-            let new_len = buf.len() * 2;
-            buf.resize(new_len, 0);
         }
 
         if let Some(group) = result.as_ref() {
@@ -102,7 +104,7 @@ fn is_user_in_group(gid: Gid) -> Result<bool, GrpError> {
     unsafe {
         match libc::getgroups(size, groups.as_mut_ptr()) {
             -1 => Err(GrpError::from_errno("failed to fetch list of groups")),
-            ret @ _ => {
+            ret => {
                 if size > ret {
                     groups.truncate(ret as usize);
                 }
