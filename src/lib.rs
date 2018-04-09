@@ -35,7 +35,6 @@ struct Uid(libc::uid_t);
 #[derive(Clone, Copy, PartialEq)]
 struct Gid(libc::gid_t);
 
-
 #[inline]
 unsafe fn errno() -> libc::c_int {
     *libc::__errno_location()

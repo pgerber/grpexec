@@ -1,6 +1,7 @@
 extern crate env_logger;
 extern crate grpexec;
 
+use std::borrow::Cow;
 use std::os::unix::process::CommandExt;
 use std::process::{self, Command};
 use std::env;
@@ -8,9 +9,10 @@ use std::env;
 const DEFAULT_PROGNAME: &str = "grpexec";
 
 fn abort(msg: &str, show_usage: bool) -> ! {
-    let program_name = env::args_os().next().map_or_else(
-        || DEFAULT_PROGNAME.to_string(),
-        |n| n.to_string_lossy().to_string(),
+    let program_name = env::args_os().next();
+    let program_name = program_name.as_ref().map_or_else(
+        || Cow::Borrowed(DEFAULT_PROGNAME),
+        |n| n.to_string_lossy(),
     );
     eprintln!("ERROR: {}", msg);
     if show_usage {
